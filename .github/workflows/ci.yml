@@ -35,15 +35,15 @@ jobs:
         working-directory: ./backend
         run: |
           npm install
-          node seedTasksData.js
+          node seedTaskData.js  # make sure filename is correct
 
   test:
     runs-on: ubuntu-latest
-    needs: mongo-init   # makes sure mongo-init runs first
+    needs: mongo-init
 
     env:
-    PORT: ${{ secrets.PORT }}
-    MONGO_URI: ${{ secrets.MONGOURI }}
+      PORT: 5000
+      MONGO_URI: mongodb://localhost:27017/mern_test
 
     steps:
       - name: Checkout Repository
