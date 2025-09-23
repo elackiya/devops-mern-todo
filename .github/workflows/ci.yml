@@ -35,7 +35,7 @@ jobs:
         working-directory: ./backend
         run: |
           npm install
-          node seedTaskData.js  # make sure filename is correct
+          node seedTasksData.js  # make sure filename is correct
 
   test:
     runs-on: ubuntu-latest
