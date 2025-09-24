@@ -5,41 +5,19 @@ on:
     branches: [main]
 
 jobs:
-  mongo-init:
+  test:
     runs-on: ubuntu-latest
 
     services:
       mongo:
-        image: mongo
+        image: mongo:latest
         ports:
           - 27017:27017
-
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '22'
-
-      - name: Waiting for MongoDB to be ready
-        run: |
-          until nc -z localhost 27017; do
-            echo "waiting for MongoDB...."
-            sleep 2
-          done
-          echo "MongoDB is up"
-
-      - name: Seed MongoDB
-        working-directory: ./backend
-        run: |
-          npm install
-          node seedTasksData.js  # make sure filename is correct
-
-  test:
-    runs-on: ubuntu-latest
-    needs: mongo-init
+        options: >-
+          --health-cmd="mongosh --eval 'db.adminCommand({ ping: 1 })'"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
 
     env:
       PORT: 5000
@@ -54,9 +32,13 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Install dependencies for backend
+      - name: Install backend dependencies
         working-directory: ./backend
         run: npm install
+
+      - name: Seed MongoDB
+        working-directory: ./backend
+        run: node seedTasksData.js  # adjust if file name differs
 
       - name: Run backend tests
         working-directory: ./backend
